@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongexpress
+  labels:
+    app: mongexpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongexpress
+  template:
+    metadata:
+      name: mongexpress
+      labels:
+        app: mongexpress
+    spec:
+      containers:
+        - name: mongexpress
+          image: mongo-express:latest
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: ME_CONFIG_MONGODB_ADMINUSERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: username
+            - name: ME_CONFIG_MONGODB_ADMINPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: password
+            - name: ME_CONFIG_MONGODB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-creds
+                  key: link
+            - name: ME_CONFIG_BASICAUTH_USERNAME
+              value: admin
+            - name: ME_CONFIG_BASICAUTH_PASSWORD
+              value: admin
+          ports:
+            - containerPort: 8081
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongexpress-service
+spec:
+  selector:
+    app: mongexpress
+  type: NodePort
+  ports:
+    - port: 8081
+      protocol: TCP
+      targetPort: 8081
+      nodePort: 30008

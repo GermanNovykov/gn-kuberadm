@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: light
+  labels:
+    app: light
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: light
+  template:
+    metadata:
+      name: light
+      labels:
+        app: light
+    spec:
+      containers:
+        - name: light
+          image: german29/gn-lighttpd:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+      restartPolicy: Always
